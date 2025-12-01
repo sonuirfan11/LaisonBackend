@@ -27,7 +27,7 @@ class CustomUser(AbstractUser, BaseModel, PermissionsMixin):
         ("admin", "Admin"),
     ]
     mobile = PhoneNumberField(unique=True, db_index=True)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    #role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     otp = models.CharField(max_length=6, null=True, blank=True)
     otp_expiry = models.DateTimeField(null=True, blank=True)
 
@@ -62,7 +62,6 @@ class ClientProfile(models.Model):
         ("female", "Female"),
         ("other", "Other"),
     ]
-
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="client_profile")
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True, blank=True)
     dob = models.DateField(null=True, blank=True)
@@ -70,7 +69,7 @@ class ClientProfile(models.Model):
     loyalty_points = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"Client Profile - {self.user.get_full_name}"
+        return f"Client Profile - {self.user.get_full_name()}"
 
 
 class ProfessionalProfile(models.Model):
@@ -83,7 +82,7 @@ class ProfessionalProfile(models.Model):
     total_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
-        return f"Professional - {self.user.get_full_name}"
+        return f"Professional - {self.user.get_full_name()}"
 
 
 class ProfessionalVerification(models.Model):

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'corsheaders',
     'users',
     'phonenumber_field'
 ]
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -83,7 +85,13 @@ DATABASES = {
         'PORT': '5432',  # Default PostgreSQL port
     }
 }
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173"]
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -114,11 +122,17 @@ REST_FRAMEWORK = {
 
 # JWT configuration (SimpleJWT)
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),     # access token valid for 15 minutes
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),     # access token valid for 15 minutes
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),        # refresh token valid for 1 day
     'ROTATE_REFRESH_TOKENS': True,                      # issue new refresh token when used
     'BLACKLIST_AFTER_ROTATION': True,                   # old refresh token becomes invalid
-    'AUTH_HEADER_TYPES': ('Bearer',),                   # frontend sends: Authorization: Bearer <token>
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    # frontend sends: Authorization: Bearer <token>
+    'AUTH_COOKIE': 'access_token',  # Custom cookie name
+    'AUTH_COOKIE_SECURE': False,     # Set to True in production (HTTPS)
+    'AUTH_COOKIE_HTTP_ONLY': True,
+    'AUTH_COOKIE_SAMESITE': 'Strict',
+
 }
 
 # Internationalization
