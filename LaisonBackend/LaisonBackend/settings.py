@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'mptt',
     'services',
-    'commerce'
+    'commerce',
+    'orders',
+    'payments'
 ]
 
 MIDDLEWARE = [

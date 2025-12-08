@@ -5,6 +5,7 @@ from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 from users.models import BaseModel, ProfessionalProfile
 from django.utils import timezone
+from django.conf import settings
 
 
 class Category(MPTTModel, BaseModel):
@@ -101,3 +102,89 @@ class ProfessionalService(models.Model):
 
     def __str__(self):
         return f"{self.professional.user.full_name} - {self.service.title}"
+
+
+class ServiceReview(models.Model):
+    RATING_CHOICES = [(i, i) for i in range(1, 6)]
+
+    client = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="service_reviews"
+    )
+
+    service = models.ForeignKey(
+        "services.Service",
+        on_delete=models.CASCADE,
+        related_name="reviews"
+    )
+
+    service_request = models.ForeignKey(
+        "orders.ServiceRequest",
+        on_delete=models.CASCADE,
+        related_name="service_reviews"
+    )
+
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    review_text = models.TextField(blank=True)
+
+    # Media uploaded with review
+    images = models.JSONField(null=True, blank=True)  # list of URLs
+    videos = models.JSONField(null=True, blank=True)
+
+    is_verified = models.BooleanField(default=True)  # only after completed order
+    is_visible = models.BooleanField(default=True)   # admin moderation
+
+    helpful_count = models.PositiveIntegerField(default=0)
+    reported_count = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.service.name} - {self.rating}★"
+
+
+class ProfessionalReview(models.Model):
+    RATING_CHOICES = [(i, i) for i in range(1, 6)]
+
+    client = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="professional_reviews"
+    )
+
+    professional = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="reviews_received"
+    )
+
+    service_request = models.ForeignKey(
+        "orders.ServiceRequest",
+        on_delete=models.CASCADE,
+        related_name="professional_reviews"
+    )
+
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    review_text = models.TextField(blank=True)
+
+    # Media support
+    images = models.JSONField(null=True, blank=True)
+    videos = models.JSONField(null=True, blank=True)
+
+    # For professional response
+    reply_text = models.TextField(blank=True)
+    reply_at = models.DateTimeField(null=True, blank=True)
+
+    is_verified = models.BooleanField(default=True)
+    is_visible = models.BooleanField(default=True)
+
+    helpful_count = models.PositiveIntegerField(default=0)
+    reported_count = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Pro {self.professional_id} - {self.rating}★"
