@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.db import models
+from django.conf import settings
 from phonenumber_field.modelfields import PhoneNumberField
 from .manager import CustomUserManager
 from django.utils import timezone
@@ -107,3 +108,100 @@ class ProfessionalVerification(models.Model):
 
     def __str__(self):
         return f"Verification - {self.professional.user.full_name}"
+
+
+class ClientAddress(models.Model):
+
+    ADDRESS_TYPE_CHOICES = [
+        ("HOME", "Home"),
+        ("WORK", "Work"),
+        ("OTHER", "Other"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="client_addresses"
+    )
+
+    address_type = models.CharField(
+        max_length=20, choices=ADDRESS_TYPE_CHOICES, default="HOME"
+    )
+
+    line1 = models.CharField(max_length=255)
+    line2 = models.CharField(max_length=255, blank=True)
+    area = models.CharField(max_length=255, blank=True)
+    landmark = models.CharField(max_length=255, blank=True)
+
+    city = models.CharField(max_length=150)
+    state = models.CharField(max_length=150)
+    country = models.CharField(max_length=150, default="India")
+
+    pincode = models.CharField(max_length=10)
+
+    latitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
+    )
+    longitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
+    )
+
+    is_default = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.address_type} - {self.city}"
+
+
+class ProfessionalAddress(models.Model):
+
+    ADDRESS_TYPE_CHOICES = [
+        ("HOME", "Home"),
+        ("OFFICE", "Office"),
+        ("SERVICE_AREA", "Service Area"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="professional_addresses"
+    )
+
+    address_type = models.CharField(
+        max_length=20, choices=ADDRESS_TYPE_CHOICES, default="SERVICE_AREA"
+    )
+
+    line1 = models.CharField(max_length=255)
+    line2 = models.CharField(max_length=255, blank=True)
+    area = models.CharField(max_length=255, blank=True)
+    landmark = models.CharField(max_length=255, blank=True)
+
+    city = models.CharField(max_length=150)
+    state = models.CharField(max_length=150)
+    country = models.CharField(max_length=150, default="India")
+
+    pincode = models.CharField(max_length=10)
+
+    latitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
+    )
+    longitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
+    )
+
+    # Service reach (UrbanCompany uses it)
+    service_radius_km = models.DecimalField(
+        max_digits=5, decimal_places=2, default=5.0
+    )
+
+    is_default = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)  # soft delete
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.address_type} - {self.city}"
