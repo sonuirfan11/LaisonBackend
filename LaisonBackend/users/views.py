@@ -1,13 +1,21 @@
 from django.shortcuts import render
 
 # Create your views here.
-from .serializers import UserLoginSerializer, UpdateProfileSerializer
-from .models import CustomUser, ClientProfile
+from .serializers import (
+    UserLoginSerializer,
+    UpdateProfileSerializer,
+    AddressSerializer
+)
+from .models import (
+    CustomUser,
+    ClientProfile,
+    ClientAddress
+)
 from rest_framework.views import APIView
 from .utils import generate_otp
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
-from rest_framework import status, generics
+from rest_framework import status, generics, permissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .authentication import CookieJWTAuthentication
@@ -191,3 +199,11 @@ class LogoutView(APIView):
 #
 #         except Exception:
 #             return Response({"detail": "Invalid refresh"}, status=401)
+
+
+class AddressDetailView(generics.RetrieveUpdateAPIView):
+    serializer_class = AddressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return ClientAddress.objects.get(user=self.request.user)

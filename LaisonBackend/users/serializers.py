@@ -1,6 +1,10 @@
 from rest_framework import serializers
 from rest_framework.views import APIView
-from .models import CustomUser, ClientProfile
+from .models import (
+    CustomUser,
+    ClientProfile,
+    ClientAddress
+)
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -29,3 +33,12 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         profile.save()
 
         return instance
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientAddress
+        fields = '__all__'
+        read_only_fields = ['user']
+
+
