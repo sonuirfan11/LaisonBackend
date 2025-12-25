@@ -6,7 +6,8 @@ from .views import (
     ProfileView,
     UpdateProfileView,
     LogoutView,
-    AddressDetailView
+    AddressDetailView,
+    AddressCreateListView
 )
 urlpatterns = [
     path("login/otp", UserLoginOTPView.as_view()),
@@ -15,5 +16,7 @@ urlpatterns = [
     path("user/profile/update", UpdateProfileView.as_view(), name='profile-update'),
     path("token/refresh/", TokenRefreshView.as_view()),
     path("user/logout", LogoutView.as_view()),
-    path('address/', AddressDetailView.as_view(), name="client-address"),
+    path('address/client/detail/<int:pk>/', AddressDetailView.as_view(), name="client-address-detail"),
+    path('address/client/', AddressCreateListView.as_view(), name="client-address-create"),
+
 ]

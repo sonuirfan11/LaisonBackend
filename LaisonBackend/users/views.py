@@ -19,6 +19,7 @@ from rest_framework import status, generics, permissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .authentication import CookieJWTAuthentication
+from django.shortcuts import get_object_or_404
 
 
 class UserLoginOTPView(APIView):
@@ -27,6 +28,7 @@ class UserLoginOTPView(APIView):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             mobile = serializer.validated_data['mobile']
+            print(mobile)
             user, created = CustomUser.objects.get_or_create(mobile=mobile)
             otp = generate_otp()
             print(f"========otp======{otp}")
@@ -178,6 +180,7 @@ class LogoutView(APIView):
         except Exception as e:
             return Response({"success": False, "error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+
 # class CustomRefreshTokenView(APIView):
 #     def post(self, request):
 #         refresh_token = request.COOKIES.get("refresh_token")
@@ -206,4 +209,21 @@ class AddressDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        return ClientAddress.objects.get(user=self.request.user)
+        pk = self.kwargs.get("pk")
+        return get_object_or_404(
+            ClientAddress,
+            pk=pk,
+            user=self.request.user   # 🔒 important security check
+        )
+
+
+class AddressCreateListView(generics.ListCreateAPIView):
+    serializer_class = AddressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return ClientAddress.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
