@@ -132,7 +132,7 @@ REST_FRAMEWORK = {
 
 # JWT configuration (SimpleJWT)
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),     # access token valid for 15 minutes
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),     # access token valid for 15 minutes
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),        # refresh token valid for 1 day
     'ROTATE_REFRESH_TOKENS': True,                      # issue new refresh token when used
     'BLACKLIST_AFTER_ROTATION': True,                   # old refresh token becomes invalid
@@ -142,7 +142,6 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_SECURE': False,     # Set to True in production (HTTPS)
     'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_SAMESITE': 'Strict',
-
 }
 
 # Internationalization
